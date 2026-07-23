@@ -29,8 +29,15 @@ const getMarkerPath = (value: string): string | undefined => (
 );
 
 const getPathFromSignedUrl = (value: string): string | undefined => {
-  const match = value.match(new RegExp(`/storage/v1/object/sign/${mediaBucket}/([^?]+)`));
-  return match?.[1];
+  const patterns = [
+    new RegExp(`/storage/v1/object/sign/${mediaBucket}/([^?#\s]+)`),
+    new RegExp(`/storage/v1/object/public/${mediaBucket}/([^?#\s]+)`),
+  ];
+  for (const pattern of patterns) {
+    const match = value.match(pattern);
+    if (match?.[1]) return decodeURIComponent(match[1]);
+  }
+  return undefined;
 };
 
 const replaceAssetStrings = async (
@@ -81,14 +88,21 @@ const preparePayload = async (payload: WrappedData, ownerId: string) => {
   const pendingUploads = new Map<string, Promise<{ marker: string; path: string }>>();
 
   const storedPayload = await replaceAssetStrings(payload, async (value) => {
-    const knownMarker = signedUrlMarkers.get(value);
-    const existingPath = knownMarker ? getMarkerPath(knownMarker) : getMarkerPath(value) ?? getPathFromSignedUrl(value);
-
-    if (existingPath) {
-      assetPaths.add(existingPath);
-      return `${mediaMarkerPrefix}${existingPath}`;
+    // 1) Já é um marker conhecido ou um marker direto no payload.
+    const markerPath = getMarkerPath(value);
+    if (markerPath) {
+      assetPaths.add(markerPath);
+      return value;
     }
 
+    // 2) URL assinada antiga do Supabase Storage (aparece quando o usuário recarrega a página).
+    const signedPath = getPathFromSignedUrl(value);
+    if (signedPath) {
+      assetPaths.add(signedPath);
+      return `${mediaMarkerPrefix}${signedPath}`;
+    }
+
+    // 3) Imagem nova em base64: faz upload.
     if (!value.startsWith('data:image/')) return value;
 
     const upload = pendingUploads.get(value) ?? uploadDataUrl(value, ownerId);
