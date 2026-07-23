@@ -24,11 +24,17 @@ export const normalizeWrappedData = (data: Partial<WrappedData>, fallback: Wrapp
   const storedSongs = storedSlides?.songs?.backgroundImage === '/images/ranking/music-bg.svg'
     ? { ...storedSlides.songs, backgroundImage: fallback.slides.songs.backgroundImage }
     : storedSlides?.songs;
+  const storedStartDate = data.startDate
+    && !Number.isNaN(new Date(data.startDate).getTime())
+    && new Date(data.startDate).getTime() <= Date.now()
+    ? data.startDate
+    : fallback.startDate;
 
   return {
     ...fallback,
     ...data,
     schemaVersion: fallback.schemaVersion,
+    startDate: storedStartDate,
     audioTheme: data.audioTheme ?? 'love',
     audio: { ...fallback.audio, ...data.audio },
     spotify: { ...fallback.spotify, ...data.spotify },

@@ -199,7 +199,7 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
             </label>
             <label className="block text-sm text-white/70">
               Início do namoro
-              <input type="date" value={draft.startDate.slice(0, 10)} onChange={(event) => setDraft((current) => ({ ...current, startDate: `${event.target.value}T00:00:00.000` }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+              <input type="date" value={draft.startDate.slice(0, 10)} onChange={(event) => setDraft((current) => ({ ...current, startDate: `${event.target.value}T00:00:00.000-03:00` }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
             </label>
           </div>
         </section>

@@ -48,7 +48,9 @@ const clampIndex = (index: number): number => {
 };
 
 const getDaysTogether = (startDate: string): number => {
-  const differenceInMilliseconds = Date.now() - new Date(startDate).getTime();
+  const start = new Date(startDate).getTime();
+  if (Number.isNaN(start)) return 0;
+  const differenceInMilliseconds = Date.now() - start;
   return Math.max(0, Math.floor(differenceInMilliseconds / 86_400_000));
 };
 
