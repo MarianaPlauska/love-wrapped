@@ -357,6 +357,57 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
         </section>
 
         <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Carta de amor</h2>
+          <p className="text-sm leading-6 text-white/60">Um texto em formato de carta, exibido como se estivesse sendo aberta. Use quebras de linha para separar parágrafos.</p>
+          <label className="block text-sm text-white/70">
+            Saudação
+            <input value={draft.slides.loveLetter?.greeting ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, loveLetter: { ...(current.slides.loveLetter ?? {}), greeting: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Texto da carta
+            <textarea value={draft.slides.loveLetter?.body ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, loveLetter: { ...(current.slides.loveLetter ?? {}), body: event.target.value } } }))} rows={6} className="mt-2 w-full resize-none rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Assinatura
+            <input value={draft.slides.loveLetter?.signature ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, loveLetter: { ...(current.slides.loveLetter ?? {}), signature: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Linha do tempo</h2>
+          <p className="text-sm leading-6 text-white/60">Marcos do relacionamento em ordem cronológica. Use fotos enviadas na seção Fotos como imagem de cada ponto.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <input value={draft.slides.timeline?.headline ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), headline: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Subtítulo
+            <input value={draft.slides.timeline?.subcopy ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), subcopy: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          {(draft.slides.timeline?.events ?? []).map((event, index) => (
+            <div key={index} className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-lime-300">Evento {String(index + 1).padStart(2, '0')}</p>
+              <label className="block text-sm text-white/70">
+                Data
+                <input value={event.date} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, date: eventInput.target.value } : item) } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+              </label>
+              <label className="block text-sm text-white/70">
+                Título
+                <input value={event.title} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, title: eventInput.target.value } : item) } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+              </label>
+              <label className="block text-sm text-white/70">
+                Descrição
+                <textarea value={event.description} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, description: eventInput.target.value } : item) } } }))} rows={2} className="mt-2 w-full resize-none rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+              </label>
+              <label className="block text-sm text-white/70">
+                URL da foto (use uma foto enviada na seção Fotos)
+                <input value={event.image} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, image: eventInput.target.value } : item) } } }))} placeholder="/images/couple/memory-1.svg" className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none placeholder:text-white/35 focus:border-lime-300" />
+              </label>
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
           <h2 className="font-display text-xl">Fotos</h2>
           <p className="text-sm leading-6 text-white/60">Para manter tudo leve, escolha fotos com até 1,5 MB.</p>
           <div className="grid grid-cols-2 gap-3">

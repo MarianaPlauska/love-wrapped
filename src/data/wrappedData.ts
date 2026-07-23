@@ -64,6 +64,26 @@ export type WrappedLoveReasons = {
   reasons: string[];
 };
 
+export type WrappedLoveLetter = {
+  greeting: string;
+  body: string;
+  signature: string;
+};
+
+export type WrappedTimelineEvent = {
+  date: string;
+  title: string;
+  description: string;
+  image: string;
+};
+
+export type WrappedTimeline = {
+  label: string;
+  headline: string;
+  subcopy: string;
+  events: WrappedTimelineEvent[];
+};
+
 export type WrappedRanking = {
   label: string;
   headline: string;
@@ -167,6 +187,8 @@ export type WrappedData = {
     };
     yearPoster: WrappedYearPoster;
     loveReasons: WrappedLoveReasons;
+    loveLetter: WrappedLoveLetter;
+    timeline: WrappedTimeline;
     summary: {
       label: string;
       title: string;
@@ -372,6 +394,22 @@ const wrappedData: WrappedData = {
         'De como qualquer lugar fica bom com você do lado.',
         'Das suas mãos que parecem ter sido feitas para as minhas.',
         'Do seu amor que me faz querer ser melhor.',
+      ],
+    },
+    loveLetter: {
+      greeting: 'Para você, meu amor',
+      body: 'Se eu pudesse reunir em palavras tudo o que você significa para mim, precisaria de muito mais do que uma carta. Mas saiba que em cada risada, em cada silêncio, em cada plano espontâneo, eu te encontro. Você é minha pessoa favorita em todo o universo.',
+      signature: 'Com todo o meu amor',
+    },
+    timeline: {
+      label: 'Nossa linha do tempo',
+      headline: 'Os momentos que construíram a gente',
+      subcopy: 'Cada data é um capítulo da nossa história.',
+      events: [
+        { date: '14/04/2024', title: 'O primeiro encontro', description: 'Quando descobrimos que conversar com você era a melhor parte do dia.', image: '/images/couple/memory-1.svg' },
+        { date: '14/04/2024', title: 'O primeiro beijo', description: 'O momento em que tudo deixou de ser só interessante e virou inesquecível.', image: '/images/couple/memory-2.svg' },
+        { date: '01/09/2024', title: 'Jogo do Fluminense', description: 'Torcida, gritaria e a certeza de que qualquer lugar fica bom com você do lado.', image: '/images/couple/memory-3.svg' },
+        { date: '10/12/2024', title: 'Viagem de fim de ano', description: 'Malas desarrumadas, mapas errados e memórias perfeitas.', image: '/images/couple/memory-4.svg' },
       ],
     },
     summary: {

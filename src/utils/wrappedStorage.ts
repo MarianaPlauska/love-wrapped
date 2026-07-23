@@ -63,6 +63,10 @@ export const normalizeWrappedData = (data: Partial<WrappedData>, fallback: Wrapp
       memories: { ...fallback.slides.memories, ...storedSlides?.memories },
       yearPoster: isCurrentSchema ? { ...fallback.slides.yearPoster, ...storedSlides?.yearPoster } : fallback.slides.yearPoster,
       loveReasons: { ...fallback.slides.loveReasons, ...storedSlides?.loveReasons },
+      loveLetter: { ...fallback.slides.loveLetter, ...storedSlides?.loveLetter },
+      timeline: storedSlides?.timeline
+        ? { ...fallback.slides.timeline, ...storedSlides.timeline, events: storedSlides.timeline.events.slice(0, 5) }
+        : fallback.slides.timeline,
       summary: isCurrentSchema ? { ...fallback.slides.summary, ...storedSlides?.summary } : fallback.slides.summary,
     },
   };
