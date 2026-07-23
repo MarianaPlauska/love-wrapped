@@ -6,12 +6,14 @@ import { OwnerAccess } from './components/OwnerAccess';
 import { SetupPanel } from './components/SetupPanel';
 import { FavoriteMomentSlide } from './components/Slides/FavoriteMomentSlide';
 import { FoodAnswerSlide } from './components/Slides/FoodAnswerSlide';
+import { HoursStorySlide } from './components/Slides/HoursStorySlide';
 import { IntroSlide } from './components/Slides/IntroSlide';
 import { MemoriesSlide } from './components/Slides/MemoriesSlide';
 import { MetricsSlide } from './components/Slides/MetricsSlide';
 import { MusicPlayerSlide } from './components/Slides/MusicPlayerSlide';
 import { OriginSlide } from './components/Slides/OriginSlide';
 import { RelationshipSeriesSlide } from './components/Slides/RelationshipSeriesSlide';
+import { SpotifyStorySlide } from './components/Slides/SpotifyStorySlide';
 import { TapRevealRankingSlide } from './components/Slides/TapRevealRankingSlide';
 import { SummarySlide } from './components/Slides/SummarySlide';
 import { VersusSlide } from './components/Slides/VersusSlide';
@@ -27,10 +29,10 @@ import { beginSpotifyImport, consumeSpotifyImport, isSpotifyImportConfigured } f
 import { loadWrappedData, normalizeWrappedData, resetWrappedData, saveWrappedData } from './utils/wrappedStorage';
 
 const slides = [
-  'intro', 'origin',
-  'food-reveal', 'food-answer', 'song-reveal', 'music-player',
+  'intro', 'origin', 'hours-story', 'metrics',
+  'food-reveal', 'food-answer', 'song-reveal', 'music-player', 'spotify-story',
   'favorite-moment', 'relationship-series',
-  'metrics', 'memories', 'versus-1', 'versus-2', 'year-poster',
+  'memories', 'versus-1', 'versus-2', 'year-poster',
   'love-letter', 'timeline', 'love-reasons', 'summary',
 ] as const;
 const progressUpdateMs = 32;
@@ -77,6 +79,7 @@ export default function App() {
 
   const currentSlide = slides[currentIndex] as SlideKey;
   const daysTogether = useMemo(() => getDaysTogether(data.startDate), [data.startDate]);
+  const hoursTogether = useMemo(() => daysTogether * 24, [daysTogether]);
   const currentAudioSource = useMemo(() => audioThemes.find((theme) => theme.id === data.audioTheme)?.source ?? audioThemes[0].source, [data.audioTheme]);
   const authError = useMemo(() => {
     if (!window.location.hash.startsWith('#error=')) return '';
@@ -336,6 +339,22 @@ export default function App() {
   const renderCurrentSlide = () => {
     if (currentSlide === 'origin') {
       return <OriginSlide data={data.slides.origin} palette={data.palettes.intro} />;
+    }
+
+    if (currentSlide === 'hours-story') {
+      return <HoursStorySlide hoursTogether={hoursTogether} data={data.slides.hoursStory} palette={data.palettes.metrics} />;
+    }
+
+    if (currentSlide === 'spotify-story') {
+      return (
+        <SpotifyStorySlide
+          data={data.slides.spotifyStory}
+          palette={data.palettes.summary}
+          song={data.slides.songs.entries[0]}
+          coverImage={data.heroImages[data.slides.spotifyStory.coverSlot]}
+          spotifyUri={data.spotify.featuredUri}
+        />
+      );
     }
 
     if (currentSlide === 'food-reveal') {

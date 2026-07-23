@@ -262,6 +262,23 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-lime-300">Resposta</p>
                 <input value={entry.title} onChange={(event) => setDraft((current) => updateRanking(current, ranking, index, 'title', event.target.value))} aria-label={`Título ${ranking} ${index + 1}`} className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
                 <input value={entry.subtitle} onChange={(event) => setDraft((current) => updateRanking(current, ranking, index, 'subtitle', event.target.value))} aria-label={`Subtítulo ${ranking} ${index + 1}`} className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
+                <textarea
+                  value={entry.detail}
+                  onChange={(event) => setDraft((current) => ({
+                    ...current,
+                    slides: {
+                      ...current.slides,
+                      [ranking]: {
+                        ...current.slides[ranking],
+                        entries: current.slides[ranking].entries.map((item, itemIndex) => itemIndex === index ? { ...item, detail: event.target.value } : item),
+                      },
+                    },
+                  }))}
+                  placeholder="Por que essa resposta representa vocês duas?"
+                  rows={2}
+                  aria-label={`Sobre ${ranking} ${index + 1}`}
+                  className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300"
+                />
                 <select value={entry.visual ?? rankingVisualOptions[ranking === 'foods' ? 'food' : 'music'][0].value} onChange={(event) => setDraft((current) => updateRanking(current, ranking, index, 'visual', event.target.value))} aria-label={`Tema visual ${ranking} ${index + 1}`} className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300">
                   {rankingVisualOptions[ranking === 'foods' ? 'food' : 'music'].map((option) => <option key={option.value} value={option.value} className="bg-zinc-950">{option.label}</option>)}
                 </select>
@@ -269,6 +286,43 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
             ))}
           </section>
         ))}
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Story: horas juntas</h2>
+          <p className="text-sm leading-6 text-white/60">Aparece logo depois de &quot;Onde tudo começou&quot;, antes da pizza.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <input value={draft.slides.hoursStory.headline} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, hoursStory: { ...current.slides.hoursStory, headline: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Subtítulo
+            <input value={draft.slides.hoursStory.subcopy} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, hoursStory: { ...current.slides.hoursStory, subcopy: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Fato curioso engraçado
+            <textarea value={draft.slides.hoursStory.funFact} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, hoursStory: { ...current.slides.hoursStory, funFact: event.target.value } } }))} rows={2} className="mt-2 w-full resize-none rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Story: nossa música</h2>
+          <p className="text-sm leading-6 text-white/60">Aparece depois do player, com foto do casal e texto editável.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <input value={draft.slides.spotifyStory.headline} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, spotifyStory: { ...current.slides.spotifyStory, headline: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Subtítulo
+            <input value={draft.slides.spotifyStory.subcopy} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, spotifyStory: { ...current.slides.spotifyStory, subcopy: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Foto de capa
+            <select value={draft.slides.spotifyStory.coverSlot} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, spotifyStory: { ...current.slides.spotifyStory, coverSlot: event.target.value as 'intro' | 'introSecondary' } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300">
+              <option value="intro" className="bg-zinc-950">Círculo da Mariana</option>
+              <option value="introSecondary" className="bg-zinc-950">Círculo da Marianna</option>
+            </select>
+          </label>
+        </section>
 
         <section className="space-y-3 border-t border-white/10 pt-6">
           <h2 className="font-display text-xl">Momento favorito</h2>

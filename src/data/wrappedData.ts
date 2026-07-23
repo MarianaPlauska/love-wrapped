@@ -70,6 +70,20 @@ export type WrappedLoveLetter = {
   signature: string;
 };
 
+export type WrappedHoursStory = {
+  label: string;
+  headline: string;
+  subcopy: string;
+  funFact: string;
+};
+
+export type WrappedSpotifyStory = {
+  label: string;
+  headline: string;
+  subcopy: string;
+  coverSlot: 'intro' | 'introSecondary';
+};
+
 export type WrappedTimelineEvent = {
   date: string;
   title: string;
@@ -156,6 +170,8 @@ export type WrappedData = {
       suffix: string;
       subcopy: string;
     };
+    hoursStory: WrappedHoursStory;
+    spotifyStory: WrappedSpotifyStory;
     genre: {
       label: string;
       genre: string;
@@ -200,11 +216,11 @@ export type WrappedData = {
 };
 
 const wrappedData: WrappedData = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   title: 'Wrapped das Mariannnas',
   coupleNames: 'Mariana & Marianna',
   year: 2026,
-  startDate: '2024-04-14T00:00:00.000-03:00',
+  startDate: '2024-07-24T00:00:00.000-03:00',
   slideDurationMs: 12000,
   audioTheme: 'love',
   audio: {
@@ -282,11 +298,11 @@ const wrappedData: WrappedData = {
     },
     origin: {
       label: 'Onde tudo começou',
-      date: '14 de abril de 2024',
+      date: '24 de julho de 2024',
       location: 'Rio de Janeiro, Brasil',
-      constellation: 'Gêmeos',
-      moon: 'Lua crescente, cerca de 38° acima do horizonte',
-      observation: 'Rio de Janeiro · 14/04/2024 · aproximadamente 17h BRT',
+      constellation: 'Leão',
+      moon: 'Lua cheia, cerca de 42° acima do horizonte',
+      observation: 'Rio de Janeiro · 24/07/2024 · aproximadamente 18h BRT',
       backgroundImage: '/images/couple/memory-1.svg',
       skyImage: '',
       nasaUrl: 'https://science.nasa.gov/resource/moon-phase-and-libration-2024/',
@@ -307,7 +323,7 @@ const wrappedData: WrappedData = {
       subtitle: 'Toque para descobrir a música que representa a gente.',
       backgroundImage: '',
       entries: [
-        { rank: 1, title: 'Nossa música', subtitle: 'A trilha da nossa história', detail: 'Edite este título no painel e coloque a música de vocês duas.', accent: 'text-lime-300', visual: 'vinyl' },
+        { rank: 1, title: 'Sonha Comigo', subtitle: 'Zé Neto & Cristiano', detail: 'A gente já dançou essa no quarto, no carro e na cozinha. Agora é nossa.', accent: 'text-lime-300', visual: 'vinyl' },
       ],
     },
     favoriteMoment: {
@@ -329,6 +345,18 @@ const wrappedData: WrappedData = {
       label: 'Dias juntos',
       suffix: 'dias',
       subcopy: 'Contagem calculada em tempo real a partir da data de início.',
+    },
+    hoursStory: {
+      label: 'Horas juntas',
+      headline: 'Cada hora ao seu lado é um acerto na playlist da vida',
+      subcopy: 'A gente já viveu mais horas juntos do que episódios de muita série.',
+      funFact: 'Isso daria para assistir a todo Harry Potter mais de 300 vezes.',
+    },
+    spotifyStory: {
+      label: 'A nossa trilha',
+      headline: 'A música que a gente escolheria de novo',
+      subcopy: 'Toque no play quando quiser lembrar por que a gente combina.',
+      coverSlot: 'intro',
     },
     genre: {
       label: 'Gênero do relacionamento',
@@ -379,7 +407,7 @@ const wrappedData: WrappedData = {
     },
     yearPoster: {
       headline: 'O nosso 2024 em uma imagem',
-      bestDay: '14 de abril',
+      bestDay: '24 de julho',
       songOfTheYear: 'Aquela que tocou no primeiro beijo',
       mood: 'Caos + carinho',
       quote: 'Em todas as versões da nossa história, eu escolheria você de novo.',
@@ -406,8 +434,8 @@ const wrappedData: WrappedData = {
       headline: 'Os momentos que construíram a gente',
       subcopy: 'Cada data é um capítulo da nossa história.',
       events: [
-        { date: '14/04/2024', title: 'O primeiro encontro', description: 'Quando descobrimos que conversar com você era a melhor parte do dia.', image: '/images/couple/memory-1.svg' },
-        { date: '14/04/2024', title: 'O primeiro beijo', description: 'O momento em que tudo deixou de ser só interessante e virou inesquecível.', image: '/images/couple/memory-2.svg' },
+        { date: '24/07/2024', title: 'O primeiro encontro', description: 'Quando descobrimos que conversar com você era a melhor parte do dia.', image: '/images/couple/memory-1.svg' },
+        { date: '24/07/2024', title: 'O primeiro beijo', description: 'O momento em que tudo deixou de ser só interessante e virou inesquecível.', image: '/images/couple/memory-2.svg' },
         { date: '01/09/2024', title: 'Jogo do Fluminense', description: 'Torcida, gritaria e a certeza de que qualquer lugar fica bom com você do lado.', image: '/images/couple/memory-3.svg' },
         { date: '10/12/2024', title: 'Viagem de fim de ano', description: 'Malas desarrumadas, mapas errados e memórias perfeitas.', image: '/images/couple/memory-4.svg' },
       ],
