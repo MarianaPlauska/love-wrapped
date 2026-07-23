@@ -28,6 +28,11 @@ const getMarkerPath = (value: string): string | undefined => (
   value.startsWith(mediaMarkerPrefix) ? value.slice(mediaMarkerPrefix.length) : undefined
 );
 
+const getPathFromSignedUrl = (value: string): string | undefined => {
+  const match = value.match(new RegExp(`/storage/v1/object/sign/${mediaBucket}/([^?]+)`));
+  return match?.[1];
+};
+
 const replaceAssetStrings = async (
   value: unknown,
   replace: (value: string) => Promise<string> | string,
@@ -76,11 +81,12 @@ const preparePayload = async (payload: WrappedData, ownerId: string) => {
   const pendingUploads = new Map<string, Promise<{ marker: string; path: string }>>();
 
   const storedPayload = await replaceAssetStrings(payload, async (value) => {
-    const existingMarker = signedUrlMarkers.get(value) ?? value;
-    const existingPath = getMarkerPath(existingMarker);
+    const knownMarker = signedUrlMarkers.get(value);
+    const existingPath = knownMarker ? getMarkerPath(knownMarker) : getMarkerPath(value) ?? getPathFromSignedUrl(value);
+
     if (existingPath) {
       assetPaths.add(existingPath);
-      return existingMarker;
+      return `${mediaMarkerPrefix}${existingPath}`;
     }
 
     if (!value.startsWith('data:image/')) return value;

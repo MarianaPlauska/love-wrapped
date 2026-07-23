@@ -18,3 +18,7 @@
 - [x] Validar todos os slides em viewport mobile.
 - [x] Publicar a nova versão na Vercel.
 - [x] Criar commit e enviar para o GitHub.
+- [x] Corrigir botão "Salvar e ver" para fechar o editor e mostrar o carrossel.
+- [x] Proteger salvamento contra URLs assinadas antigas do Supabase.
+- [x] Adicionar autoplay ao player do Spotify quando configurado.
+- [x] Criar slide "Por que eu te amo" com motivos editáveis.

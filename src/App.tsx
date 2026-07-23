@@ -16,6 +16,7 @@ import { TapRevealRankingSlide } from './components/Slides/TapRevealRankingSlide
 import { SummarySlide } from './components/Slides/SummarySlide';
 import { VersusSlide } from './components/Slides/VersusSlide';
 import { YearPosterSlide } from './components/Slides/YearPosterSlide';
+import { LoveReasonsSlide } from './components/Slides/LoveReasonsSlide';
 import wrappedData, { type WrappedData } from './data/wrappedData';
 import { canManageGifts, loadOwnerGift, loadSharedGift, saveOwnerGift } from './lib/giftRepository';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
@@ -27,7 +28,7 @@ const slides = [
   'intro', 'origin',
   'food-reveal', 'food-answer', 'song-reveal', 'music-player',
   'favorite-moment', 'relationship-series',
-  'metrics', 'memories', 'versus-1', 'versus-2', 'year-poster', 'summary',
+  'metrics', 'memories', 'versus-1', 'versus-2', 'year-poster', 'love-reasons', 'summary',
 ] as const;
 const progressUpdateMs = 32;
 
@@ -346,6 +347,8 @@ export default function App() {
         return <VersusSlide data={data.slides.versus} palette={data.palettes.genre} page={1} />;
       case 'year-poster':
         return <YearPosterSlide data={data.slides.yearPoster} palette={data.palettes.summary} coupleNames={data.coupleNames} year={data.year} />;
+      case 'love-reasons':
+        return <LoveReasonsSlide data={data.slides.loveReasons} palette={data.palettes.summary} />;
       case 'summary':
         return <SummarySlide data={data.slides.summary} palette={data.palettes.summary} daysTogether={daysTogether} coupleNames={data.coupleNames} year={data.year} food={data.slides.foods.entries[0]?.title ?? 'Pizza'} song={data.slides.songs.entries[0]?.title ?? 'Nossa música'} favoriteMoment={data.slides.favoriteMoment.title} relationshipSeries={data.slides.relationshipSeries.title} memoryCount={data.memoryPhotos.length} verdictCount={data.slides.versus.items.length} />;
       default:

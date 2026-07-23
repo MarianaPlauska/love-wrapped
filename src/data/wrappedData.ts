@@ -58,6 +58,12 @@ export type WrappedYearPoster = {
   decorations: string[];
 };
 
+export type WrappedLoveReasons = {
+  label: string;
+  headline: string;
+  reasons: string[];
+};
+
 export type WrappedRanking = {
   label: string;
   headline: string;
@@ -160,6 +166,7 @@ export type WrappedData = {
       items: WrappedVersusItem[];
     };
     yearPoster: WrappedYearPoster;
+    loveReasons: WrappedLoveReasons;
     summary: {
       label: string;
       title: string;
@@ -355,6 +362,17 @@ const wrappedData: WrappedData = {
       mood: 'Caos + carinho',
       quote: 'Em todas as versões da nossa história, eu escolheria você de novo.',
       decorations: ['—', '+', '×', '·'],
+    },
+    loveReasons: {
+      label: 'Por que eu te amo',
+      headline: 'Algumas das razões que me fazem escolher você todos os dias',
+      reasons: [
+        'Do seu jeito de rir das minhas piadas ruins.',
+        'Da paciência que você tem nos dias difíceis.',
+        'De como qualquer lugar fica bom com você do lado.',
+        'Das suas mãos que parecem ter sido feitas para as minhas.',
+        'Do seu amor que me faz querer ser melhor.',
+      ],
     },
     summary: {
       label: 'Nosso resumo',

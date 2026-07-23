@@ -4,7 +4,7 @@
 
 Um presente digital criado para celebrar a história de dois anos com o meu amor. Inspirado no ritmo narrativo do Spotify Wrapped e dos Stories, ele transforma datas, lugares, fotos, música e pequenas lembranças em uma experiência vertical feita para o celular.
 
-Ao longo de 14 capítulos, o presente relembra onde tudo começou sob a nossa constelação, revela a comida e a música do casal, registra o jogo do Fluminense, celebra a série *Brooklyn Nine-Nine* e reúne memórias e respostas de “Quem é mais?”. As telas usam tipografia cinética, fotos que surgem como revelações e um player do Spotify dentro da própria história.
+Ao longo de 15 capítulos, o presente relembra onde tudo começou sob a nossa constelação, revela a comida e a música do casal, registra o jogo do Fluminense, celebra a série *Brooklyn Nine-Nine*, reúne memórias, respostas de “Quem é mais?” e pequenos motivos para amar. As telas usam tipografia cinética, fotos que surgem como revelações e um player do Spotify dentro da própria história.
 
 ## Experiência
 

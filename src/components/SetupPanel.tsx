@@ -56,6 +56,10 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
     const file = event.target.files?.[0];
     setImageError('');
 
+    // Permite selecionar o mesmo arquivo novamente depois.
+    const input = event.target;
+    if (input) input.value = '';
+
     if (!file) {
       return;
     }
@@ -103,15 +107,23 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
     }
   };
 
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSaving(true);
     setSaveError('');
+    setSaveSuccess(false);
 
     try {
       const nextShareUrl = await onSave(draft);
       if (nextShareUrl) setSavedShareUrl(nextShareUrl);
-      setIsSaving(false);
+      setSaveSuccess(true);
+      // Fecha o editor e volta ao carrossel para que "Salvar e ver" realmente mostre o resultado.
+      window.setTimeout(() => {
+        setIsSaving(false);
+        onClose();
+      }, 450);
     } catch {
       setSaveError('Não foi possível salvar. Revise a conexão com o sistema e tente novamente.');
       setIsSaving(false);
@@ -317,6 +329,34 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
         </section>
 
         <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Por que eu te amo</h2>
+          <p className="text-sm leading-6 text-white/60">Pequenos motivos que aparecem um a um antes do resumo final. Use frases curtas e verdadeiras.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <textarea value={draft.slides.loveReasons?.headline ?? ''} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, loveReasons: { ...(current.slides.loveReasons ?? {}), headline: event.target.value } } }))} rows={2} className="mt-2 w-full resize-none rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          {(draft.slides.loveReasons?.reasons ?? []).map((reason, index) => (
+            <label key={index} className="block text-sm text-white/70">
+              Motivo {String(index + 1).padStart(2, '0')}
+              <input
+                value={reason}
+                onChange={(event) => setDraft((current) => ({
+                  ...current,
+                  slides: {
+                    ...current.slides,
+                    loveReasons: {
+                      ...(current.slides.loveReasons ?? { label: '', headline: '', reasons: [] }),
+                      reasons: (current.slides.loveReasons?.reasons ?? []).map((item, itemIndex) => itemIndex === index ? event.target.value : item),
+                    },
+                  },
+                }))}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300"
+              />
+            </label>
+          ))}
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
           <h2 className="font-display text-xl">Fotos</h2>
           <p className="text-sm leading-6 text-white/60">Para manter tudo leve, escolha fotos com até 1,5 MB.</p>
           <div className="grid grid-cols-2 gap-3">
@@ -370,9 +410,16 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
           )}
         </section>
 
-        <div className="flex gap-3 border-t border-white/10 pt-6">
-          <button type="button" onClick={onRestoreDefaults} className="flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white/75 hover:border-white/40 hover:text-white">Restaurar</button>
-          <button type="submit" disabled={isSaving} className="flex-[1.5] rounded-xl bg-lime-300 px-4 py-3 text-sm font-bold text-zinc-950 hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Salvando...' : 'Salvar e ver'}</button>
+        <div className="flex flex-col gap-3 border-t border-white/10 pt-6">
+          {saveSuccess && (
+            <p role="status" className="text-center text-sm font-semibold text-lime-300">
+              Presente salvo! Abrindo o carrossel...
+            </p>
+          )}
+          <div className="flex gap-3">
+            <button type="button" onClick={onRestoreDefaults} className="flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white/75 hover:border-white/40 hover:text-white">Restaurar</button>
+            <button type="submit" disabled={isSaving} className="flex-[1.5] rounded-xl bg-lime-300 px-4 py-3 text-sm font-bold text-zinc-950 hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Salvando...' : 'Salvar e ver'}</button>
+          </div>
         </div>
       </form>
     </div>

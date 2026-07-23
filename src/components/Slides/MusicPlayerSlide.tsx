@@ -13,7 +13,7 @@ type MusicPlayerSlideProps = {
 
 export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlideProps) => {
   const song = data.entries[0];
-  const spotifyEmbedUrl = getSpotifyEmbedUrl(spotifyUri);
+  const spotifyEmbedUrl = getSpotifyEmbedUrl(spotifyUri, true);
 
   return (
     <SlideSurface palette={palette} className="justify-between bg-[#1ed760]">
