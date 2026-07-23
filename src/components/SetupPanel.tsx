@@ -445,10 +445,12 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
                 Descrição
                 <textarea value={event.description} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, description: eventInput.target.value } : item) } } }))} rows={2} className="mt-2 w-full resize-none rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
               </label>
-              <label className="block text-sm text-white/70">
-                URL da foto (use uma foto enviada na seção Fotos)
-                <input value={event.image} onChange={(eventInput) => setDraft((current) => ({ ...current, slides: { ...current.slides, timeline: { ...(current.slides.timeline ?? {}), events: (current.slides.timeline?.events ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, image: eventInput.target.value } : item) } } }))} placeholder="/images/couple/memory-1.svg" className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none placeholder:text-white/35 focus:border-lime-300" />
-              </label>
+              <ImageUploadButton
+                slot={`timeline-${index}` as ImageSlot}
+                label={`Foto do evento ${String(index + 1).padStart(2, '0')}`}
+                source={event.image}
+                onChange={handleImage}
+              />
             </div>
           ))}
         </section>

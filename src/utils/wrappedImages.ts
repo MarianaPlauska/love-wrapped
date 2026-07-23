@@ -1,6 +1,6 @@
 import type { WrappedData } from '../data/wrappedData';
 
-export type ImageSlot = 'intro' | 'introSecondary' | 'summary' | 'origin-bg' | 'food-bg' | 'song-bg' | 'favorite-moment' | 'series-bg' | 'sky' | 'memory-0' | 'memory-1' | 'memory-2' | 'memory-3' | 0 | 1 | 2 | 3;
+export type ImageSlot = 'intro' | 'introSecondary' | 'summary' | 'origin-bg' | 'food-bg' | 'song-bg' | 'favorite-moment' | 'series-bg' | 'sky' | 'memory-0' | 'memory-1' | 'memory-2' | 'memory-3' | 'timeline-0' | 'timeline-1' | 'timeline-2' | 'timeline-3' | 'timeline-4' | 0 | 1 | 2 | 3;
 
 export const imageLabels: Array<{ slot: ImageSlot; label: string }> = [
   { slot: 'intro', label: 'Círculo da Mariana' },
@@ -49,6 +49,11 @@ export const getWrappedImage = (data: WrappedData, slot: ImageSlot): string | un
     return data.memoryPhotos[index]?.image;
   }
 
+  if (typeof slot === 'string' && slot.startsWith('timeline-')) {
+    const index = Number(slot.replace('timeline-', ''));
+    return data.slides.timeline?.events[index]?.image;
+  }
+
   return data.slides.summary.cells[slot as number]?.image;
 };
 
@@ -85,6 +90,20 @@ export const setWrappedImage = (data: WrappedData, slot: ImageSlot, source: stri
     return {
       ...data,
       memoryPhotos: data.memoryPhotos.map((photo, photoIndex) => photoIndex === index ? { ...photo, image: source } : photo),
+    };
+  }
+
+  if (typeof slot === 'string' && slot.startsWith('timeline-')) {
+    const index = Number(slot.replace('timeline-', ''));
+    return {
+      ...data,
+      slides: {
+        ...data.slides,
+        timeline: {
+          ...(data.slides.timeline ?? { label: '', headline: '', subcopy: '', events: [] }),
+          events: (data.slides.timeline?.events ?? []).map((event, eventIndex) => eventIndex === index ? { ...event, image: source } : event),
+        },
+      },
     };
   }
 
