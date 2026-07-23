@@ -60,6 +60,8 @@ export const normalizeWrappedData = (data: Partial<WrappedData>, fallback: Wrapp
       metrics: { ...fallback.slides.metrics, ...storedSlides?.metrics },
       hoursStory: { ...fallback.slides.hoursStory, ...storedSlides?.hoursStory },
       spotifyStory: { ...fallback.slides.spotifyStory, ...storedSlides?.spotifyStory },
+      wheel: { ...fallback.slides.wheel, ...storedSlides?.wheel },
+      placesMap: { ...fallback.slides.placesMap, ...storedSlides?.placesMap },
       genre: { ...fallback.slides.genre, ...storedSlides?.genre },
       moments: { ...fallback.slides.moments, ...storedSlides?.moments },
       memories: { ...fallback.slides.memories, ...storedSlides?.memories },

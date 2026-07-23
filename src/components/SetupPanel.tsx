@@ -429,6 +429,46 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
         </section>
 
         <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Roleta da sorte</h2>
+          <p className="text-sm leading-6 text-white/60">Gire no carrossel e descubra declarações, desafios e vales. Adicione até 6 itens.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <input value={draft.slides.wheel.headline} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, wheel: { ...current.slides.wheel, headline: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Subtítulo
+            <input value={draft.slides.wheel.subcopy} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, wheel: { ...current.slides.wheel, subcopy: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          {draft.slides.wheel.items.map((item, index) => (
+            <div key={index} className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-lime-300">Item {String(index + 1).padStart(2, '0')}</p>
+              <input value={item.label} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, wheel: { ...current.slides.wheel, items: current.slides.wheel.items.map((it, i) => i === index ? { ...it, label: event.target.value } : it) } } }))} placeholder="Declaração, Desafio, Vale..." className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
+              <textarea value={item.content} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, wheel: { ...current.slides.wheel, items: current.slides.wheel.items.map((it, i) => i === index ? { ...it, content: event.target.value } : it) } } }))} placeholder="Texto que aparece quando a roleta parar" rows={2} className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
+          <h2 className="font-display text-xl">Mapa da gente</h2>
+          <p className="text-sm leading-6 text-white/60">Os lugares que contam a história de vocês. Edite o nome e a descrição de cada pin.</p>
+          <label className="block text-sm text-white/70">
+            Título
+            <input value={draft.slides.placesMap.headline} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, placesMap: { ...current.slides.placesMap, headline: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          <label className="block text-sm text-white/70">
+            Subtítulo
+            <input value={draft.slides.placesMap.subcopy} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, placesMap: { ...current.slides.placesMap, subcopy: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
+          </label>
+          {draft.slides.placesMap.places.map((place, index) => (
+            <div key={index} className="space-y-2 rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-lime-300">Lugar {String(index + 1).padStart(2, '0')}</p>
+              <input value={place.name} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, placesMap: { ...current.slides.placesMap, places: current.slides.placesMap.places.map((p, i) => i === index ? { ...p, name: event.target.value } : p) } } }))} placeholder="Nome do lugar" className="w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
+              <textarea value={place.description} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, placesMap: { ...current.slides.placesMap, places: current.slides.placesMap.places.map((p, i) => i === index ? { ...p, description: event.target.value } : p) } } }))} placeholder="Por que esse lugar é especial?" rows={2} className="w-full resize-none rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-lime-300" />
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-3 border-t border-white/10 pt-6">
           <h2 className="font-display text-xl">Por que eu te amo</h2>
           <p className="text-sm leading-6 text-white/60">Pequenos motivos que aparecem um a um antes do resumo final. Use frases curtas e verdadeiras.</p>
           <label className="block text-sm text-white/70">

@@ -12,9 +12,11 @@ import { MemoriesSlide } from './components/Slides/MemoriesSlide';
 import { MetricsSlide } from './components/Slides/MetricsSlide';
 import { MusicPlayerSlide } from './components/Slides/MusicPlayerSlide';
 import { OriginSlide } from './components/Slides/OriginSlide';
+import { PlacesMapSlide } from './components/Slides/PlacesMapSlide';
 import { RelationshipSeriesSlide } from './components/Slides/RelationshipSeriesSlide';
 import { SpotifyStorySlide } from './components/Slides/SpotifyStorySlide';
 import { TapRevealRankingSlide } from './components/Slides/TapRevealRankingSlide';
+import { WheelSlide } from './components/Slides/WheelSlide';
 import { SummarySlide } from './components/Slides/SummarySlide';
 import { VersusSlide } from './components/Slides/VersusSlide';
 import { YearPosterSlide } from './components/Slides/YearPosterSlide';
@@ -31,8 +33,8 @@ import { loadWrappedData, normalizeWrappedData, resetWrappedData, saveWrappedDat
 const slides = [
   'intro', 'origin', 'hours-story', 'metrics',
   'food-reveal', 'food-answer', 'song-reveal', 'music-player', 'spotify-story',
-  'favorite-moment', 'relationship-series',
-  'memories', 'versus-1', 'versus-2', 'year-poster',
+  'favorite-moment', 'relationship-series', 'places-map',
+  'memories', 'versus-1', 'versus-2', 'year-poster', 'wheel',
   'love-letter', 'timeline', 'love-reasons', 'summary',
 ] as const;
 const progressUpdateMs = 32;
@@ -355,6 +357,14 @@ export default function App() {
           spotifyUri={data.spotify.featuredUri}
         />
       );
+    }
+
+    if (currentSlide === 'wheel') {
+      return <WheelSlide data={data.slides.wheel} palette={data.palettes.tracks} />;
+    }
+
+    if (currentSlide === 'places-map') {
+      return <PlacesMapSlide data={data.slides.placesMap} palette={data.palettes.intro} />;
     }
 
     if (currentSlide === 'food-reveal') {

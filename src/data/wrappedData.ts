@@ -77,6 +77,30 @@ export type WrappedHoursStory = {
   funFact: string;
 };
 
+export type WrappedWheelItem = {
+  label: string;
+  content: string;
+};
+
+export type WrappedWheel = {
+  label: string;
+  headline: string;
+  subcopy: string;
+  items: WrappedWheelItem[];
+};
+
+export type WrappedMapPlace = {
+  name: string;
+  description: string;
+};
+
+export type WrappedPlacesMap = {
+  label: string;
+  headline: string;
+  subcopy: string;
+  places: WrappedMapPlace[];
+};
+
 export type WrappedSpotifyStory = {
   label: string;
   headline: string;
@@ -172,6 +196,8 @@ export type WrappedData = {
     };
     hoursStory: WrappedHoursStory;
     spotifyStory: WrappedSpotifyStory;
+    wheel: WrappedWheel;
+    placesMap: WrappedPlacesMap;
     genre: {
       label: string;
       genre: string;
@@ -216,7 +242,7 @@ export type WrappedData = {
 };
 
 const wrappedData: WrappedData = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   title: 'Wrapped das Mariannnas',
   coupleNames: 'Mariana & Marianna',
   year: 2026,
@@ -357,6 +383,31 @@ const wrappedData: WrappedData = {
       headline: 'A música que a gente escolheria de novo',
       subcopy: 'Toque no play quando quiser lembrar por que a gente combina.',
       coverSlot: 'intro',
+    },
+    wheel: {
+      label: 'Roleta da sorte',
+      headline: 'Gire e descubra o que o destino reservou',
+      subcopy: 'Toque na roleta para parar e ver a surpresa do casal.',
+      items: [
+        { label: 'Declaração', content: 'Você é minha pessoa favorita em todo o universo.' },
+        { label: 'Desafio', content: 'Manda um áudio cantando o refrão da nossa música.' },
+        { label: 'Vale', content: 'Vale 1 cafuné de 10 minutos sem reclamar.' },
+        { label: 'Pergunta', content: 'Qual foi o dia que você mais riu comigo?' },
+        { label: 'Declaração', content: 'Em todas as versões da minha vida, eu escolheria você.' },
+        { label: 'Desafio', content: 'Tira uma selfie agora fazendo a nossa cara de mico.' },
+      ],
+    },
+    placesMap: {
+      label: 'Mapa da gente',
+      headline: 'Os lugares que fazem parte da nossa história',
+      subcopy: 'Cada pin é um capítulo que só a gente entende.',
+      places: [
+        { name: 'Onde nos conhecemos', description: 'O ponto zero de tudo. Ainda lembro do que você vestia.' },
+        { name: 'Primeiro encontro', description: 'Nervosismo, riso fácil e a certeza de que seria especial.' },
+        { name: 'Nosso restaurante', description: 'Aquele lugar que virou nosso plano B favorito.' },
+        { name: 'Primeira viagem', description: 'Malas, mapas e a primeira história para contar junto.' },
+        { name: 'Primeiro "eu te amo"', description: 'O lugar onde três palavras pararam de parecer pouco.' },
+      ],
     },
     genre: {
       label: 'Gênero do relacionamento',
