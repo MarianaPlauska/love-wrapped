@@ -81,16 +81,25 @@ export const WheelSlide = ({ data, palette }: WheelSlideProps) => {
           >
             {data.items.map((item, index) => {
               const angle = index * (360 / data.items.length);
+              const sliceAngle = 360 / data.items.length;
+              const label = item.shortLabel || item.label;
               return (
                 <div
                   key={index}
                   className="absolute left-1/2 top-1/2 flex w-28 origin-left -translate-y-1/2 items-center justify-center"
                   style={{
-                    transform: `rotate(${angle + 360 / data.items.length / 2}deg) translateX(40px)`,
+                    transform: `rotate(${angle + sliceAngle / 2}deg) translateX(40px)`,
                   }}
                 >
-                  <span className="rotate-180 text-center text-[10px] font-black uppercase tracking-wider text-zinc-950 drop-shadow-sm" style={{ writingMode: 'vertical-rl' }}>
-                    {item.label}
+                  <span
+                    className="rotate-180 text-center font-black uppercase tracking-wider text-zinc-950 drop-shadow-sm"
+                    style={{
+                      writingMode: 'vertical-rl',
+                      fontSize: label.length > 10 ? '0.55rem' : label.length > 6 ? '0.65rem' : '0.75rem',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {label}
                   </span>
                 </div>
               );

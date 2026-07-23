@@ -79,6 +79,7 @@ export type WrappedHoursStory = {
 
 export type WrappedWheelItem = {
   label: string;
+  shortLabel?: string;
   content: string;
 };
 
@@ -389,12 +390,12 @@ const wrappedData: WrappedData = {
       headline: 'Gire e descubra o que o destino reservou',
       subcopy: 'Toque na roleta para parar e ver a surpresa do casal.',
       items: [
-        { label: 'Declaração', content: 'Você é minha pessoa favorita em todo o universo.' },
-        { label: 'Desafio', content: 'Manda um áudio cantando o refrão da nossa música.' },
-        { label: 'Vale', content: 'Vale 1 cafuné de 10 minutos sem reclamar.' },
-        { label: 'Pergunta', content: 'Qual foi o dia que você mais riu comigo?' },
-        { label: 'Declaração', content: 'Em todas as versões da minha vida, eu escolheria você.' },
-        { label: 'Desafio', content: 'Tira uma selfie agora fazendo a nossa cara de mico.' },
+        { label: 'Declaração', shortLabel: '♥', content: 'Você é minha pessoa favorita em todo o universo.' },
+        { label: 'Desafio', shortLabel: 'Desafio', content: 'Manda um áudio cantando o refrão da nossa música.' },
+        { label: 'Vale', shortLabel: 'Vale', content: 'Vale 1 cafuné de 10 minutos sem reclamar.' },
+        { label: 'Pergunta', shortLabel: '?', content: 'Qual foi o dia que você mais riu comigo?' },
+        { label: 'Declaração', shortLabel: '♥', content: 'Em todas as versões da minha vida, eu escolheria você.' },
+        { label: 'Desafio', shortLabel: 'Desafio', content: 'Tira uma selfie agora fazendo a nossa cara de mico.' },
       ],
     },
     placesMap: {
