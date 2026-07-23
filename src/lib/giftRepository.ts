@@ -11,6 +11,10 @@ type StoredGiftRow = GiftRow & {
   asset_paths: unknown;
 };
 
+type SavedGiftRow = StoredGiftRow & {
+  updated_at: string;
+};
+
 type SignedAsset = {
   path: string;
   signedUrl: string;
@@ -28,16 +32,33 @@ const getMarkerPath = (value: string): string | undefined => (
   value.startsWith(mediaMarkerPrefix) ? value.slice(mediaMarkerPrefix.length) : undefined
 );
 
+const canonicalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (!value || typeof value !== 'object') return value;
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => [key, canonicalize(item)]),
+  );
+};
+
+const hasSameJsonValue = (left: unknown, right: unknown): boolean => (
+  JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right))
+);
+
 const getPathFromSignedUrl = (value: string): string | undefined => {
-  const patterns = [
-    new RegExp(`/storage/v1/object/sign/${mediaBucket}/([^?#\s]+)`),
-    new RegExp(`/storage/v1/object/public/${mediaBucket}/([^?#\s]+)`),
-  ];
-  for (const pattern of patterns) {
-    const match = value.match(pattern);
-    if (match?.[1]) return decodeURIComponent(match[1]);
+  try {
+    const url = new URL(value);
+    const prefixes = [
+      `/storage/v1/object/sign/${mediaBucket}/`,
+      `/storage/v1/object/public/${mediaBucket}/`,
+    ];
+    const prefix = prefixes.find((candidate) => url.pathname.startsWith(candidate));
+    return prefix ? decodeURIComponent(url.pathname.slice(prefix.length)) : undefined;
+  } catch {
+    return undefined;
   }
-  return undefined;
 };
 
 const replaceAssetStrings = async (
@@ -164,10 +185,16 @@ export const saveOwnerGift = async (wrappedData: WrappedData, giftId?: string): 
   const owner = await getCurrentOwner();
   if (!supabase) throw new Error('Supabase is not configured');
 
-  const existingAssetPaths = giftId
-    ? await supabase.from('gifts').select('asset_paths').eq('id', giftId).single()
-    : { data: null, error: null };
-  if (existingAssetPaths.error) throw existingAssetPaths.error;
+  const existingGiftQuery = supabase
+    .from('gifts')
+    .select('id, asset_paths')
+    .eq('owner_id', owner.id)
+    .order('updated_at', { ascending: false })
+    .limit(1);
+  if (giftId) existingGiftQuery.eq('id', giftId);
+
+  const { data: existingGift, error: existingGiftError } = await existingGiftQuery.maybeSingle();
+  if (existingGiftError) throw existingGiftError;
 
   const { storedPayload, assetPaths, uploadedPaths } = await preparePayload(wrappedData, owner.id);
 
@@ -180,21 +207,38 @@ export const saveOwnerGift = async (wrappedData: WrappedData, giftId?: string): 
     is_published: true,
   };
 
-  const query = giftId
-    ? supabase.from('gifts').update(values).eq('id', giftId).select('id, payload, share_token').single()
-    : supabase.from('gifts').insert(values).select('id, payload, share_token').single();
-  const { data, error } = await query;
+  const query = existingGift?.id
+    ? supabase.from('gifts').update(values).eq('id', existingGift.id).eq('owner_id', owner.id).select('id, payload, share_token, asset_paths, updated_at').single()
+    : supabase.from('gifts').insert(values).select('id, payload, share_token, asset_paths, updated_at').single();
+  const { data: savedGift, error } = await query;
 
   if (error) {
     if (uploadedPaths.length > 0) await supabase.storage.from(mediaBucket).remove(uploadedPaths);
     throw error;
   }
 
-  const staleAssetPaths = getAssetPaths(existingAssetPaths.data?.asset_paths)
+  const { data: verifiedGift, error: verificationError } = await supabase
+    .from('gifts')
+    .select('id, payload, share_token, asset_paths, updated_at')
+    .eq('id', (savedGift as SavedGiftRow).id)
+    .eq('owner_id', owner.id)
+    .single();
+
+  if (verificationError || !verifiedGift) {
+    throw verificationError ?? new Error('Saved gift could not be verified');
+  }
+
+  const verified = verifiedGift as SavedGiftRow;
+  if (!hasSameJsonValue(verified.payload, storedPayload) || !hasSameJsonValue(verified.asset_paths, assetPaths)) {
+    throw new Error('Supabase returned different gift data after saving');
+  }
+
+  const staleAssetPaths = getAssetPaths(existingGift?.asset_paths)
     .filter((path) => !assetPaths.includes(path));
   if (staleAssetPaths.length > 0) await supabase.storage.from(mediaBucket).remove(staleAssetPaths);
 
-  return { ...(data as GiftRow), payload: wrappedData };
+  const payload = await hydratePayload(verified.payload, await signOwnerAssets(getAssetPaths(verified.asset_paths)));
+  return { id: verified.id, share_token: verified.share_token, payload };
 };
 
 export const loadSharedGift = async (shareToken: string): Promise<WrappedData> => {

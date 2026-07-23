@@ -56,6 +56,8 @@ export default function App() {
   });
   const [isOwnerAuthenticated, setIsOwnerAuthenticated] = useState(false);
   const [ownerAccess, setOwnerAccess] = useState<'unknown' | 'granted' | 'denied'>('unknown');
+  const [isOwnerGiftLoaded, setIsOwnerGiftLoaded] = useState(false);
+  const [ownerGiftLoadError, setOwnerGiftLoadError] = useState('');
   const [ownerGiftId, setOwnerGiftId] = useState<string | undefined>();
   const [shareUrl, setShareUrl] = useState<string | undefined>();
   const [isSharedGiftLoading, setIsSharedGiftLoading] = useState(() => Boolean(new URLSearchParams(window.location.search).get('gift')));
@@ -85,7 +87,8 @@ export default function App() {
   }, []);
   const isLocalEditor = isAdminRoute && !isSupabaseConfigured;
   const canOpenEditor = !new URLSearchParams(window.location.search).get('gift');
-  const isSetupOpen = isLocalEditor || (isAdminRoute && isOwnerAuthenticated && ownerAccess === 'granted');
+  const isRemoteEditorReady = isAdminRoute && isOwnerAuthenticated && ownerAccess === 'granted' && isOwnerGiftLoaded;
+  const isSetupOpen = isLocalEditor || isRemoteEditorReady;
 
   useEffect(() => {
     const updateRoute = () => {
@@ -101,16 +104,34 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!isOwnerAuthenticated || ownerAccess !== 'granted' || !isSupabaseConfigured) return;
+    if (!isOwnerAuthenticated || ownerAccess !== 'granted' || !isSupabaseConfigured) {
+      setIsOwnerGiftLoaded(false);
+      setOwnerGiftLoadError('');
+      return;
+    }
+
+    let isActive = true;
+    setIsOwnerGiftLoaded(false);
+    setOwnerGiftLoadError('');
 
     void loadOwnerGift()
       .then((gift) => {
-        if (!gift) return;
-        setData(normalizeWrappedData(gift.payload, wrappedData));
-        setOwnerGiftId(gift.id);
-        setShareUrl(`${window.location.origin}${window.location.pathname}?gift=${gift.share_token}`);
+        if (!isActive) return;
+        if (gift) {
+          setData(normalizeWrappedData(gift.payload, wrappedData));
+          setOwnerGiftId(gift.id);
+          setShareUrl(`${window.location.origin}${window.location.pathname}?gift=${gift.share_token}`);
+        }
+        setIsOwnerGiftLoaded(true);
       })
-      .catch(() => undefined);
+      .catch((error: unknown) => {
+        if (!isActive) return;
+        setOwnerGiftLoadError(error instanceof Error ? error.message : 'Não foi possível carregar o presente salvo.');
+      });
+
+    return () => {
+      isActive = false;
+    };
   }, [isOwnerAuthenticated, ownerAccess]);
 
   useEffect(() => {
@@ -289,7 +310,7 @@ export default function App() {
       setOwnerGiftId(gift.id);
       const nextShareUrl = `${window.location.origin}${window.location.pathname}?gift=${gift.share_token}`;
       setShareUrl(nextShareUrl);
-      setData(dataWithAudio);
+      setData(normalizeWrappedData(gift.payload, wrappedData));
       setCurrentIndex(0);
       return nextShareUrl;
     } else {
@@ -377,8 +398,24 @@ export default function App() {
               <p className="mt-4 text-sm leading-6 text-white/60">{sharedGiftError}</p>
             </div>
           </div>
+        ) : ownerGiftLoadError && isAdminRoute && ownerAccess === 'granted' ? (
+          <div className="flex h-full items-center justify-center px-8 text-center">
+            <div>
+              <p className="font-display text-3xl leading-tight text-rose-300">Não foi possível abrir o editor</p>
+              <p className="mt-4 text-sm leading-6 text-white/60">Seus dados não foram substituídos. Recarregue a página para tentar buscar novamente na Supabase.</p>
+              <p className="mt-3 break-words text-xs leading-5 text-rose-200/70">{ownerGiftLoadError}</p>
+              <button type="button" onClick={() => window.location.reload()} className="mt-6 rounded-xl bg-lime-300 px-5 py-3 text-sm font-bold text-zinc-950">Tentar novamente</button>
+            </div>
+          </div>
+        ) : isAdminRoute && isOwnerAuthenticated && ownerAccess === 'granted' && !isOwnerGiftLoaded ? (
+          <div className="flex h-full items-center justify-center px-8 text-center">
+            <div>
+              <p className="font-display text-3xl leading-tight text-lime-300">Carregando seu presente salvo...</p>
+              <p className="mt-4 text-sm leading-6 text-white/60">O editor só será aberto depois de confirmar os dados na Supabase.</p>
+            </div>
+          </div>
         ) : isSetupOpen ? (
-          <SetupPanel data={data} shareUrl={shareUrl} spotifyImportAvailable={isSpotifyImportConfigured} onClose={() => { window.location.assign(window.location.pathname); }} onRestoreDefaults={handleRestoreDefaults} onSave={handleSave} onSpotifyImport={handleSpotifyImport} />
+          <SetupPanel key={ownerGiftId ?? 'new-gift'} data={data} shareUrl={shareUrl} spotifyImportAvailable={isSpotifyImportConfigured} onClose={() => { window.location.assign(window.location.pathname); }} onRestoreDefaults={handleRestoreDefaults} onSave={handleSave} onSpotifyImport={handleSpotifyImport} />
         ) : isAdminRoute ? (
           <OwnerAccess accessDenied={ownerAccess === 'denied'} accessError={authError} />
         ) : (

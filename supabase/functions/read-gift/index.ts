@@ -33,7 +33,10 @@ Deno.serve(async (request) => {
     .eq("is_published", true)
     .maybeSingle();
 
-  if (error) return response({ error: "Could not load this gift" }, 500);
+  if (error) {
+    console.error("read-gift query failed", error);
+    return response({ error: "Could not load this gift" }, 500);
+  }
   if (!gift) return response({ error: "Gift not found" }, 404);
 
   const assetPaths = Array.isArray(gift.asset_paths)
@@ -43,7 +46,10 @@ Deno.serve(async (request) => {
     ? await admin.storage.from("gift-media").createSignedUrls(assetPaths, 60 * 60)
     : { data: [], error: null };
 
-  if (signingError) return response({ error: "Could not prepare gift media" }, 500);
+  if (signingError) {
+    console.error("read-gift signing failed", signingError);
+    return response({ error: "Could not prepare gift media" }, 500);
+  }
 
   return response({
     id: gift.id,

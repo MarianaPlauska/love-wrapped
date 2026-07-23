@@ -462,9 +462,10 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
         </section>
 
         <div className="flex flex-col gap-3 border-t border-white/10 pt-6">
+          {saveError && <p role="alert" className="text-center text-sm leading-6 text-rose-200">{saveError}</p>}
           {saveSuccess && (
             <p role="status" className="text-center text-sm font-semibold text-lime-300">
-              Presente salvo! Abrindo o carrossel...
+              Presente confirmado na Supabase. Abrindo o carrossel...
             </p>
           )}
           <div className="flex gap-3">
