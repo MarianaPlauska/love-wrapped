@@ -29,6 +29,7 @@ import { isSupabaseConfigured, supabase } from './lib/supabase';
 import { audioThemes } from './utils/audio';
 import { beginSpotifyImport, consumeSpotifyImport, isSpotifyImportConfigured } from './utils/spotifyAuth';
 import { loadWrappedData, normalizeWrappedData, resetWrappedData, saveWrappedData } from './utils/wrappedStorage';
+import { getSongCoverImage } from './utils/wrappedImages';
 
 const slides = [
   'intro', 'origin', 'hours-story', 'metrics',
@@ -74,6 +75,7 @@ export default function App() {
   const [isHolding, setIsHolding] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [shareFeedback, setShareFeedback] = useState('');
+  const [audioHintVisible, setAudioHintVisible] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressTimerRef = useRef<number | null>(null);
   const progressRef = useRef(0);
@@ -85,6 +87,7 @@ export default function App() {
   const daysTogether = useMemo(() => getDaysTogether(data.startDate), [data.startDate]);
   const hoursTogether = useMemo(() => daysTogether * 24, [daysTogether]);
   const currentAudioSource = useMemo(() => audioThemes.find((theme) => theme.id === data.audioTheme)?.source ?? audioThemes[0].source, [data.audioTheme]);
+  const songCoverImage = useMemo(() => getSongCoverImage(data), [data]);
   const authError = useMemo(() => {
     if (!window.location.hash.startsWith('#error=')) return '';
     const parameters = new URLSearchParams(window.location.hash.slice(1));
@@ -182,7 +185,10 @@ export default function App() {
     }
 
     void loadSharedGift(shareToken)
-      .then((sharedData) => setData(normalizeWrappedData(sharedData, wrappedData)))
+      .then((sharedData) => {
+        setShareUrl(`${window.location.origin}${window.location.pathname}?gift=${shareToken}`);
+        setData(normalizeWrappedData(sharedData, wrappedData));
+      })
       .catch(() => setSharedGiftError('Este presente não está disponível ou o link está incorreto.'))
       .finally(() => setIsSharedGiftLoading(false));
   }, []);
@@ -198,7 +204,7 @@ export default function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const isInteractiveSlide = currentSlide === 'food-reveal' || currentSlide === 'song-reveal';
+  const isInteractiveSlide = currentSlide === 'food-reveal' || currentSlide === 'song-reveal' || currentSlide === 'wheel';
 
   useEffect(() => {
     progressRef.current = 0;
@@ -292,7 +298,8 @@ export default function App() {
   };
 
   const handleShare = async () => {
-    const url = window.location.href;
+    const shareToken = new URLSearchParams(window.location.search).get('gift');
+    const url = shareUrl ?? (shareToken ? `${window.location.origin}${window.location.pathname}?gift=${shareToken}` : window.location.href);
     try {
       if (navigator.share) {
         await navigator.share({ title: data.title, text: 'Wrapped das Mariannnas', url });
@@ -355,7 +362,7 @@ export default function App() {
           data={data.slides.spotifyStory}
           palette={data.palettes.summary}
           song={data.slides.songs.entries[0]}
-          coverImage={data.heroImages[data.slides.spotifyStory.coverSlot]}
+          coverImage={songCoverImage ?? data.heroImages[data.slides.spotifyStory.coverSlot]}
           spotifyUri={data.spotify.featuredUri}
         />
       );
@@ -382,7 +389,7 @@ export default function App() {
     }
 
     if (currentSlide === 'music-player') {
-      return <MusicPlayerSlide data={data.slides.songs} palette={data.palettes.summary} spotifyUri={data.spotify.featuredUri} />;
+      return <MusicPlayerSlide data={data.slides.songs} palette={data.palettes.summary} spotifyUri={data.spotify.featuredUri} coverImage={songCoverImage} />;
     }
 
     switch (currentSlide) {
@@ -446,7 +453,7 @@ export default function App() {
             </div>
           </div>
         ) : isSetupOpen ? (
-          <SetupPanel key={ownerGiftId ?? 'new-gift'} data={data} shareUrl={shareUrl} spotifyImportAvailable={isSpotifyImportConfigured} onClose={() => { window.location.assign(window.location.pathname); }} onRestoreDefaults={handleRestoreDefaults} onSave={handleSave} onSpotifyImport={handleSpotifyImport} />
+          <SetupPanel key={ownerGiftId ?? 'new-gift'} data={data} shareUrl={shareUrl} spotifyImportAvailable={isSpotifyImportConfigured} onClose={() => { window.location.assign(shareUrl ?? window.location.pathname); }} onRestoreDefaults={handleRestoreDefaults} onSave={handleSave} onSpotifyImport={handleSpotifyImport} />
         ) : isAdminRoute ? (
           <OwnerAccess accessDenied={ownerAccess === 'denied'} accessError={authError} />
         ) : (
@@ -454,8 +461,8 @@ export default function App() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(163,230,53,0.13),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(236,72,153,0.16),_transparent_36%)]" />
             <audio ref={audioRef} src={currentAudioSource} preload="auto" playsInline loop />
 
-            <header className="relative z-30 px-4 pt-4">
-              <div className="mb-3 flex items-center justify-between gap-3 text-[0.67rem] uppercase tracking-[0.2em] text-white/50">
+            <header className="relative z-30 shrink-0 px-4 pt-3 sm:pt-4">
+              <div className="mb-2 flex items-center justify-between gap-3 text-[0.67rem] uppercase tracking-[0.2em] text-white/50 sm:mb-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="truncate">{data.title}</span>
                   {canOpenEditor && (
@@ -483,15 +490,20 @@ export default function App() {
                   >
                     {isPaused ? <Play aria-hidden="true" size={17} /> : <Pause aria-hidden="true" size={17} />}
                   </button>
-                  <button type="button" onClick={() => setAudioEnabled((value) => !value)} aria-label={audioEnabled ? 'Desligar áudio' : 'Ligar áudio'} title={audioEnabled ? 'Desligar áudio' : 'Ligar áudio'} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/8 text-white/80 backdrop-blur transition hover:bg-white/12">{audioEnabled ? <Volume2 aria-hidden="true" size={17} /> : <VolumeX aria-hidden="true" size={17} />}</button>
+                  <button type="button" onClick={() => { setAudioEnabled((value) => !value); setAudioHintVisible(false); }} aria-label={audioEnabled ? 'Desligar áudio' : 'Ligar áudio'} title={audioEnabled ? 'Desligar trilha de fundo' : 'Ligar trilha de fundo'} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/8 text-white/80 backdrop-blur transition hover:bg-white/12">{audioEnabled ? <Volume2 aria-hidden="true" size={17} /> : <VolumeX aria-hidden="true" size={17} />}</button>
                 </div>
               </div>
+              {!audioEnabled && audioHintVisible && currentIndex < 3 && (
+                <p className="mb-2 text-right text-[0.65rem] normal-case tracking-normal text-white/55">
+                  Toque no ícone de som para a trilha de fundo
+                </p>
+              )}
               {shareFeedback && <p role="status" className="mb-2 text-right text-[0.65rem] normal-case tracking-normal text-lime-200">{shareFeedback}</p>}
-              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${slides.length}, minmax(0, 1fr))` }}>
+              <div className="grid gap-0.5 sm:gap-1" style={{ gridTemplateColumns: `repeat(${slides.length}, minmax(0, 1fr))` }}>
                 {slides.map((slide, index) => {
                   const fill = index < currentIndex ? 1 : index === currentIndex ? progress : 0;
                   return (
-                    <div key={slide} className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                    <div key={slide} className="h-1 overflow-hidden rounded-full bg-white/10 sm:h-1.5">
                       <motion.div className="h-full rounded-full bg-lime-400" initial={false} animate={{ scaleX: fill }} transition={{ ease: 'linear', duration: 0.02 }} style={{ transformOrigin: 'left' }} />
                     </div>
                   );
@@ -500,7 +512,7 @@ export default function App() {
             </header>
 
             <div
-              className="relative z-10 min-h-0 flex-1 touch-none px-3 pb-3 pt-4"
+              className="relative z-10 min-h-0 flex-1 touch-none px-3 pb-2 pt-3 sm:pb-3 sm:pt-4"
               onPointerDown={handlePointerDown}
               onPointerUp={handlePointerUp}
               onPointerCancel={cancelPointerInteraction}

@@ -22,6 +22,25 @@ export const imageLabels: Array<{ slot: ImageSlot; label: string }> = [
   { slot: 3, label: 'Foto do quadrante 4' },
 ];
 
+export const isRenderableImageSource = (source?: string): source is string => Boolean(
+  source && (
+    source.startsWith('/')
+    || source.startsWith('http')
+    || source.startsWith('data:image/')
+    || source.startsWith('gift-media://')
+  ),
+);
+
+export const getSongCoverImage = (data: WrappedData): string | undefined => {
+  const coverSlot = data.slides.spotifyStory.coverSlot;
+  const heroImage = data.heroImages[coverSlot];
+  const songBackground = data.slides.songs.backgroundImage;
+
+  if (isRenderableImageSource(heroImage)) return heroImage;
+  if (isRenderableImageSource(songBackground)) return songBackground;
+  return undefined;
+};
+
 export const getWrappedImage = (data: WrappedData, slot: ImageSlot): string | undefined => {
   if (slot === 'sky') {
     return data.slides.origin.skyImage;

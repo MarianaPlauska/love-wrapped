@@ -3,38 +3,38 @@ import { Heart, Music2, Play, SkipBack, SkipForward } from 'lucide-react';
 
 import type { WrappedData } from '../../data/wrappedData';
 import { getSpotifyEmbedUrl } from '../../utils/spotify';
-import { SlidePill, SlideSurface } from './Shared';
+import { isRenderableImageSource } from '../../utils/wrappedImages';
+import { SlidePill, SlideScrollBody, SlideSurface } from './Shared';
 
 type MusicPlayerSlideProps = {
   data: WrappedData['slides']['songs'];
   palette: WrappedData['palettes']['summary'];
   spotifyUri: string;
+  coverImage?: string;
 };
 
-export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlideProps) => {
+export const MusicPlayerSlide = ({ data, palette, spotifyUri, coverImage }: MusicPlayerSlideProps) => {
   const song = data.entries[0];
   const spotifyEmbedUrl = getSpotifyEmbedUrl(spotifyUri, true);
-  const rawImage = song.visual || data.backgroundImage || '';
-  const isValidImage = rawImage && (rawImage.startsWith('/') || rawImage.startsWith('http') || rawImage.startsWith('data:') || rawImage.startsWith('gift-media://'));
-  const coverImage = isValidImage ? rawImage : '/images/couple/memory-1.svg';
+  const spotifyOpenUrl = spotifyEmbedUrl?.replace('/embed/', '/').split('?')[0] ?? null;
+  const resolvedCover = isRenderableImageSource(coverImage) ? coverImage : '/images/couple/memory-1.svg';
 
   return (
     <SlideSurface palette={palette} className="justify-between bg-zinc-950">
-      <div className="relative z-20 flex items-center justify-between px-6 pt-6 text-white">
+      <div className="relative z-20 flex shrink-0 items-center justify-between px-6 pt-6 text-white">
         <SlidePill>{data.label}</SlidePill>
         <span className="text-xs font-black uppercase tracking-[0.18em] text-[#1ed760]">Faixa da história</span>
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col justify-center px-6">
-        {/* Capa quadrada grande estilo Spotify */}
+      <SlideScrollBody className="px-6 pb-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-auto aspect-square w-full max-w-[260px] overflow-hidden rounded-lg shadow-[0_24px_60px_rgba(30,215,96,0.25)]"
+          className="mx-auto aspect-square w-full max-w-[220px] overflow-hidden rounded-lg shadow-[0_24px_60px_rgba(30,215,96,0.25)] sm:max-w-[240px]"
         >
-          {coverImage ? (
-            <img src={coverImage} alt={song.title} className="h-full w-full object-cover" />
+          {resolvedCover ? (
+            <img src={resolvedCover} alt={song.title} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-zinc-900">
               <Music2 size={64} className="text-white/30" />
@@ -46,10 +46,10 @@ export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlide
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-6 flex items-end justify-between"
+          className="mt-5 flex items-end justify-between"
         >
           <div className="min-w-0">
-            <h2 className="truncate font-display text-3xl font-black leading-none text-white">{song.title}</h2>
+            <h2 className="truncate font-display text-2xl font-black leading-none text-white sm:text-3xl">{song.title}</h2>
             <p className="mt-2 truncate text-sm font-semibold text-white/70">{song.subtitle}</p>
           </div>
           <motion.button
@@ -61,12 +61,11 @@ export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlide
           </motion.button>
         </motion.div>
 
-        {/* Barra de progresso falsa */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-5"
+          className="mt-4"
         >
           <div className="h-1 overflow-hidden rounded-full bg-white/20">
             <motion.div
@@ -82,7 +81,6 @@ export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlide
           </div>
         </motion.div>
 
-        {/* Controles */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -90,44 +88,51 @@ export const MusicPlayerSlide = ({ data, palette, spotifyUri }: MusicPlayerSlide
           className="mt-2 flex items-center justify-between px-2"
         >
           <button className="text-white/60 hover:text-white" aria-label="Voltar">
-            <SkipBack size={28} fill="currentColor" />
+            <SkipBack size={24} fill="currentColor" />
           </button>
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1ed760] text-zinc-950 shadow-lg shadow-[#1ed760]/30"
-            aria-label="Play"
-          >
-            <Play size={28} fill="currentColor" className="ml-1" />
-          </motion.button>
+          {spotifyOpenUrl ? (
+            <motion.a
+              href={spotifyOpenUrl}
+              target="_blank"
+              rel="noreferrer"
+              whileTap={{ scale: 0.92 }}
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1ed760] text-zinc-950 shadow-lg shadow-[#1ed760]/30 sm:h-16 sm:w-16"
+              aria-label="Ouvir no Spotify"
+            >
+              <Play size={26} fill="currentColor" className="ml-1" />
+            </motion.a>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1ed760] text-zinc-950 shadow-lg shadow-[#1ed760]/30 sm:h-16 sm:w-16"
+              aria-label="Play"
+            >
+              <Play size={26} fill="currentColor" className="ml-1" />
+            </motion.button>
+          )}
           <button className="text-white/60 hover:text-white" aria-label="Avançar">
-            <SkipForward size={28} fill="currentColor" />
+            <SkipForward size={24} fill="currentColor" />
           </button>
         </motion.div>
-      </div>
 
-      {/* Sobre o casal */}
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.95 }}
-        className="relative z-20 px-6 pb-6"
-      >
-        <div className="rounded-2xl bg-zinc-900/80 p-4 backdrop-blur-sm">
-          <p className="text-[0.6rem] font-black uppercase tracking-[0.2em] text-[#1ed760]">Sobre o casal</p>
-          <p className="mt-2 text-sm font-medium leading-relaxed text-white/85">{song.detail}</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.95 }}
+          className="relative z-20 mt-5"
+        >
+          <div className="rounded-2xl bg-zinc-900/80 p-4 backdrop-blur-sm">
+            <p className="text-[0.6rem] font-black uppercase tracking-[0.2em] text-[#1ed760]">Sobre o casal</p>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-white/85">{song.detail}</p>
+          </div>
 
-        {spotifyEmbedUrl && (
-          <a
-            href={`https://open.spotify.com/track/${spotifyUri.split(':').pop()}`}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 block rounded-md border border-white/10 bg-zinc-900/60 py-3 text-center text-xs font-bold text-[#1ed760] hover:bg-zinc-900"
-          >
-            Ouvir no Spotify
-          </a>
-        )}
-      </motion.div>
+          {spotifyEmbedUrl && (
+            <p className="mt-3 text-center text-xs leading-5 text-white/55">
+              No próximo slide, o player do Spotify toca a faixa que você escolheu.
+            </p>
+          )}
+        </motion.div>
+      </SlideScrollBody>
     </SlideSurface>
   );
 };

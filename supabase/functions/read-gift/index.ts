@@ -39,11 +39,30 @@ Deno.serve(async (request) => {
   }
   if (!gift) return response({ error: "Gift not found" }, 404);
 
-  const assetPaths = Array.isArray(gift.asset_paths)
-    ? gift.asset_paths.filter((path): path is string => typeof path === "string")
-    : [];
+  const collectMediaMarkerPaths = (value: unknown, paths = new Set<string>()): string[] => {
+    if (typeof value === "string") {
+      const markerPath = value.startsWith("gift-media://") ? value.slice("gift-media://".length) : undefined;
+      if (markerPath) paths.add(markerPath);
+      return [...paths];
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item) => collectMediaMarkerPaths(item, paths));
+      return [...paths];
+    }
+    if (value && typeof value === "object") {
+      Object.values(value).forEach((item) => collectMediaMarkerPaths(item, paths));
+    }
+    return [...paths];
+  };
+
+  const assetPaths = [...new Set([
+    ...(Array.isArray(gift.asset_paths)
+      ? gift.asset_paths.filter((path): path is string => typeof path === "string")
+      : []),
+    ...collectMediaMarkerPaths(gift.payload),
+  ])];
   const { data: signedAssets, error: signingError } = assetPaths.length > 0
-    ? await admin.storage.from("gift-media").createSignedUrls(assetPaths, 60 * 60)
+    ? await admin.storage.from("gift-media").createSignedUrls(assetPaths, 60 * 60 * 24)
     : { data: [], error: null };
 
   if (signingError) {

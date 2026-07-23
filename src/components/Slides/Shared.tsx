@@ -100,3 +100,15 @@ export const SlidePill = ({ children }: { children: ReactNode }) => (
     {children}
   </span>
 );
+
+export const SlideScrollBody = ({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <div className={`relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${className}`}>
+    {children}
+  </div>
+);

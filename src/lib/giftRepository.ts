@@ -22,7 +22,10 @@ type SignedAsset = {
 
 const mediaBucket = 'gift-media';
 const mediaMarkerPrefix = 'gift-media://';
+const signedUrlTtlSeconds = 60 * 60 * 24;
 const signedUrlMarkers = new Map<string, string>();
+
+const mergeAssetPaths = (...groups: string[][]): string[] => [...new Set(groups.flat())];
 
 const getAssetPaths = (value: unknown): string[] => (
   Array.isArray(value) ? value.filter((path): path is string => typeof path === 'string') : []
@@ -31,6 +34,25 @@ const getAssetPaths = (value: unknown): string[] => (
 const getMarkerPath = (value: string): string | undefined => (
   value.startsWith(mediaMarkerPrefix) ? value.slice(mediaMarkerPrefix.length) : undefined
 );
+
+export const collectMediaMarkerPaths = (value: unknown, paths = new Set<string>()): string[] => {
+  if (typeof value === 'string') {
+    const markerPath = getMarkerPath(value);
+    if (markerPath) paths.add(markerPath);
+    return [...paths];
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectMediaMarkerPaths(item, paths));
+    return [...paths];
+  }
+
+  if (value && typeof value === 'object') {
+    Object.values(value).forEach((item) => collectMediaMarkerPaths(item, paths));
+  }
+
+  return [...paths];
+};
 
 const canonicalize = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -140,7 +162,7 @@ const preparePayload = async (payload: WrappedData, ownerId: string) => {
 const signOwnerAssets = async (assetPaths: string[]): Promise<SignedAsset[]> => {
   if (!supabase || assetPaths.length === 0) return [];
 
-  const { data, error } = await supabase.storage.from(mediaBucket).createSignedUrls(assetPaths, 60 * 60);
+  const { data, error } = await supabase.storage.from(mediaBucket).createSignedUrls(assetPaths, signedUrlTtlSeconds);
   if (error) throw error;
   return (data ?? []).flatMap((asset) => (
     asset.path && asset.signedUrl ? [{ path: asset.path, signedUrl: asset.signedUrl }] : []
@@ -177,7 +199,10 @@ export const loadOwnerGift = async (): Promise<GiftRow | null> => {
   if (error) throw error;
   if (!data) return null;
   const gift = data as StoredGiftRow;
-  const payload = await hydratePayload(gift.payload, await signOwnerAssets(getAssetPaths(gift.asset_paths)));
+  const payload = await hydratePayload(
+    gift.payload,
+    await signOwnerAssets(mergeAssetPaths(getAssetPaths(gift.asset_paths), collectMediaMarkerPaths(gift.payload))),
+  );
   return { id: gift.id, share_token: gift.share_token, payload };
 };
 
@@ -197,12 +222,13 @@ export const saveOwnerGift = async (wrappedData: WrappedData, giftId?: string): 
   if (existingGiftError) throw existingGiftError;
 
   const { storedPayload, assetPaths, uploadedPaths } = await preparePayload(wrappedData, owner.id);
+  const mergedAssetPaths = mergeAssetPaths(assetPaths, collectMediaMarkerPaths(storedPayload));
 
   const values = {
     owner_id: owner.id,
     title: wrappedData.title,
     payload: storedPayload,
-    asset_paths: assetPaths,
+    asset_paths: mergedAssetPaths,
     spotify_uris: [wrappedData.spotify.featuredUri, wrappedData.spotify.playlistUri].filter(Boolean),
     is_published: true,
   };
@@ -229,15 +255,18 @@ export const saveOwnerGift = async (wrappedData: WrappedData, giftId?: string): 
   }
 
   const verified = verifiedGift as SavedGiftRow;
-  if (!hasSameJsonValue(verified.payload, storedPayload) || !hasSameJsonValue(verified.asset_paths, assetPaths)) {
+  if (!hasSameJsonValue(verified.payload, storedPayload) || !hasSameJsonValue(verified.asset_paths, mergedAssetPaths)) {
     throw new Error('Supabase returned different gift data after saving');
   }
 
   const staleAssetPaths = getAssetPaths(existingGift?.asset_paths)
-    .filter((path) => !assetPaths.includes(path));
+    .filter((path) => !mergedAssetPaths.includes(path));
   if (staleAssetPaths.length > 0) await supabase.storage.from(mediaBucket).remove(staleAssetPaths);
 
-  const payload = await hydratePayload(verified.payload, await signOwnerAssets(getAssetPaths(verified.asset_paths)));
+  const payload = await hydratePayload(
+    verified.payload,
+    await signOwnerAssets(mergeAssetPaths(getAssetPaths(verified.asset_paths), collectMediaMarkerPaths(verified.payload))),
+  );
   return { id: verified.id, share_token: verified.share_token, payload };
 };
 
