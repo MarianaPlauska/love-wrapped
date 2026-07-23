@@ -4,7 +4,7 @@ import type { WrappedData } from '../data/wrappedData';
 import { rankingVisualOptions } from './Slides/RankingArtwork';
 import { audioThemes } from '../utils/audio';
 import { loadNasaSkyReference } from '../utils/nasa';
-import { imageLabels, setWrappedImage, type ImageSlot } from '../utils/wrappedImages';
+import { getWrappedImage, imageLabels, setWrappedImage, type ImageSlot } from '../utils/wrappedImages';
 
 type SetupPanelProps = {
   data: WrappedData;
@@ -30,6 +30,51 @@ const updateRanking = (data: WrappedData, ranking: 'foods' | 'songs', index: num
     },
   },
 });
+
+const defaultImage = '/images/couple/memory-1.svg';
+
+const isUploadedImage = (source?: string): boolean => Boolean(
+  source && source.startsWith('data:image/') || (source && source.startsWith('gift-media://')),
+);
+
+type ImageUploadButtonProps = {
+  slot: ImageSlot;
+  label: string;
+  source?: string;
+  onChange: (slot: ImageSlot, event: ChangeEvent<HTMLInputElement>) => void;
+};
+
+const ImageUploadButton = ({ slot, label, source, onChange }: ImageUploadButtonProps) => {
+  const hasImage = Boolean(source && source !== defaultImage && !source.startsWith('/images/'));
+  const isBase64 = source?.startsWith('data:image/');
+
+  return (
+    <label className="relative flex min-h-[7.5rem] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/25 bg-white/5 p-3 text-center transition active:scale-[0.98] active:border-lime-300 has-[:focus-visible]:border-lime-300 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-lime-300/40">
+      <input type="file" accept="image/*" onChange={(event) => onChange(slot, event)} className="sr-only" />
+      {hasImage && source ? (
+        <>
+          <img
+            src={source}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-cover ${isBase64 ? 'opacity-60' : 'opacity-40'}`}
+          />
+          <span className="relative z-10 max-w-full truncate px-1 text-xs font-semibold text-white drop-shadow">
+            {label}
+          </span>
+          <span className="relative z-10 mt-1 inline-flex items-center gap-1 rounded-full bg-lime-300 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-950">
+            Trocar
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="text-2xl leading-none text-white/50">+</span>
+          <span className="mt-1 text-xs font-semibold leading-tight text-white/80">{label}</span>
+          <span className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/45">Toque para enviar</span>
+        </>
+      )}
+    </label>
+  );
+};
 
 
 export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, onRestoreDefaults, onSave, onSpotifyImport }: SetupPanelProps) => {
@@ -140,7 +185,7 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
         <button type="button" onClick={onClose} className="text-sm font-semibold text-white/70 hover:text-white">Voltar</button>
       </header>
 
-      <form onSubmit={handleSubmit} className="flex-1 space-y-7 overflow-y-auto px-5 py-6 pb-10">
+      <form onSubmit={handleSubmit} className="flex-1 space-y-7 overflow-y-auto px-5 py-6 pb-32">
         <section className="space-y-3">
           <h2 className="font-display text-xl">Vocês duas</h2>
           <label className="block text-sm text-white/70">
@@ -227,11 +272,12 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
 
         <section className="space-y-3 border-t border-white/10 pt-6">
           <h2 className="font-display text-xl">Momento favorito</h2>
-          <label className="flex min-h-24 cursor-pointer flex-col justify-end rounded-xl border border-dashed border-white/25 bg-white/5 p-3 text-sm text-white/75 transition hover:border-lime-300 hover:text-lime-200">
-            <input type="file" accept="image/*" onChange={(event) => handleImage('favorite-moment', event)} className="sr-only" />
-            Foto do jogo do Fluminense
-            <span className="mt-1 text-xs uppercase tracking-[0.18em] text-white/45">Selecionar imagem</span>
-          </label>
+          <ImageUploadButton
+            slot="favorite-moment"
+            label="Foto do jogo do Fluminense"
+            source={getWrappedImage(draft, 'favorite-moment')}
+            onChange={handleImage}
+          />
           <label className="block text-sm text-white/70">
             Momento
             <input value={draft.slides.favoriteMoment.title} onChange={(event) => setDraft((current) => ({ ...current, slides: { ...current.slides, favoriteMoment: { ...current.slides.favoriteMoment, title: event.target.value } } }))} className="mt-2 w-full rounded-xl border border-white/15 bg-white/8 px-3 py-3 text-white outline-none focus:border-lime-300" />
@@ -407,20 +453,23 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
           ))}
         </section>
 
-        <section className="space-y-3 border-t border-white/10 pt-6">
-          <h2 className="font-display text-xl">Fotos</h2>
-          <p className="text-sm leading-6 text-white/60">Para manter tudo leve, escolha fotos com até 1,5 MB.</p>
+        <section className="space-y-4 border-t border-white/10 pt-6">
+          <div>
+            <h2 className="font-display text-xl">Fotos</h2>
+            <p className="mt-1 text-sm leading-6 text-white/60">Toque em cada quadrado para enviar. Máximo de 1,5 MB por foto.</p>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             {imageLabels.map(({ slot, label }) => (
-              <label key={`${slot}`} className="flex min-h-24 cursor-pointer flex-col justify-end rounded-xl border border-dashed border-white/25 bg-white/5 p-3 text-sm text-white/75 transition hover:border-lime-300 hover:text-lime-200">
-                <input type="file" accept="image/*" onChange={(event) => handleImage(slot, event)} className="sr-only" />
-                {label}
-                <span className="mt-1 text-xs uppercase tracking-[0.18em] text-white/45">Selecionar</span>
-              </label>
+              <ImageUploadButton
+                key={`${slot}`}
+                slot={slot}
+                label={label}
+                source={getWrappedImage(draft, slot)}
+                onChange={handleImage}
+              />
             ))}
           </div>
           {imageError && <p role="alert" className="text-sm leading-6 text-amber-200">{imageError}</p>}
-          {saveError && <p role="alert" className="text-sm leading-6 text-rose-200">{saveError}</p>}
         </section>
 
         <section className="space-y-3 border-t border-white/10 pt-6">
@@ -461,7 +510,7 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
           )}
         </section>
 
-        <div className="flex flex-col gap-3 border-t border-white/10 pt-6">
+        <div className="sticky bottom-0 z-10 -mx-5 mt-2 flex flex-col gap-3 border-t border-white/10 bg-zinc-950/95 px-5 py-4 backdrop-blur-sm">
           {saveError && <p role="alert" className="text-center text-sm leading-6 text-rose-200">{saveError}</p>}
           {saveSuccess && (
             <p role="status" className="text-center text-sm font-semibold text-lime-300">
@@ -469,8 +518,8 @@ export const SetupPanel = ({ data, shareUrl, spotifyImportAvailable, onClose, on
             </p>
           )}
           <div className="flex gap-3">
-            <button type="button" onClick={onRestoreDefaults} className="flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white/75 hover:border-white/40 hover:text-white">Restaurar</button>
-            <button type="submit" disabled={isSaving} className="flex-[1.5] rounded-xl bg-lime-300 px-4 py-3 text-sm font-bold text-zinc-950 hover:bg-lime-200 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Salvando...' : 'Salvar e ver'}</button>
+            <button type="button" onClick={onRestoreDefaults} className="flex-1 rounded-xl border border-white/20 px-4 py-4 text-sm font-semibold text-white/75 active:border-white/40 active:text-white">Restaurar</button>
+            <button type="submit" disabled={isSaving} className="flex-[1.5] rounded-xl bg-lime-300 px-4 py-4 text-sm font-bold text-zinc-950 active:bg-lime-200 disabled:cursor-wait disabled:opacity-60">{isSaving ? 'Salvando...' : 'Salvar e ver'}</button>
           </div>
         </div>
       </form>

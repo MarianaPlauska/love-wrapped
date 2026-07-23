@@ -22,6 +22,36 @@ export const imageLabels: Array<{ slot: ImageSlot; label: string }> = [
   { slot: 3, label: 'Foto do quadrante 4' },
 ];
 
+export const getWrappedImage = (data: WrappedData, slot: ImageSlot): string | undefined => {
+  if (slot === 'sky') {
+    return data.slides.origin.skyImage;
+  }
+
+  const backgroundSlides = {
+    'origin-bg': 'origin',
+    'food-bg': 'foods',
+    'song-bg': 'songs',
+    'favorite-moment': 'favoriteMoment',
+    'series-bg': 'relationshipSeries',
+  } as const;
+
+  if (slot in backgroundSlides) {
+    const slideKey = backgroundSlides[slot as keyof typeof backgroundSlides];
+    return (data.slides[slideKey] as { backgroundImage: string }).backgroundImage;
+  }
+
+  if (slot === 'intro' || slot === 'introSecondary' || slot === 'summary') {
+    return data.heroImages[slot];
+  }
+
+  if (typeof slot === 'string' && slot.startsWith('memory-')) {
+    const index = Number(slot.replace('memory-', ''));
+    return data.memoryPhotos[index]?.image;
+  }
+
+  return data.slides.summary.cells[slot as number]?.image;
+};
+
 export const setWrappedImage = (data: WrappedData, slot: ImageSlot, source: string): WrappedData => {
   if (slot === 'sky') {
     return { ...data, slides: { ...data.slides, origin: { ...data.slides.origin, skyImage: source } } };
