@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title description">
+  <title id="title">Wrapped das Mariannnas</title>
+  <desc id="description">Banner animado do presente Love Wrapped.</desc>
+  <rect width="1200" height="420" fill="#111111"/>
+  <rect x="0" y="0" width="24" height="420" fill="#b7f34b">
+    <animate attributeName="width" values="24;420;24" dur="5s" repeatCount="indefinite"/>
+  </rect>
+  <circle cx="1030" cy="88" r="62" fill="#ff6437">
+    <animate attributeName="r" values="62;92;62" dur="3.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1100" cy="310" r="104" fill="none" stroke="#e879f9" stroke-width="28" opacity="0.75">
+    <animateTransform attributeName="transform" type="rotate" from="0 1100 310" to="360 1100 310" dur="9s" repeatCount="indefinite"/>
+  </circle>
+  <g font-family="Arial Black, Arial, sans-serif" fill="#ffffff">
+    <text x="84" y="105" font-size="25" letter-spacing="8" fill="#b7f34b">NÓS DUAS EM REPLAY</text>
+    <text x="80" y="210" font-size="82">WRAPPED DAS</text>
+    <text x="80" y="302" font-size="92">MARIANNNAS</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-weight="700" font-size="24" fill="#ffffff">
+    <text x="84" y="365" opacity="0">
+      MEMÓRIAS
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.4;0.5" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="250" y="365" opacity="0">
+      MÚSICA
+      <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.3;0.4;0.75;0.85" dur="6s" repeatCount="indefinite"/>
+    </text>
+    <text x="385" y="365" opacity="0">
+      NOSSA HISTÓRIA
+      <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.65;0.78;1" dur="6s" repeatCount="indefinite"/>
+    </text>
+  </g>
+  <g fill="#b7f34b">
+    <rect x="80" y="388" width="120" height="8"/>
+    <rect x="210" y="388" width="120" height="8" opacity="0.35"/>
+    <rect x="340" y="388" width="120" height="8" opacity="0.2"/>
+  </g>
+</svg>

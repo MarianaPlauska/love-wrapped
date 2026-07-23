@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.tools/
+.agents/
+.claude/
+skills-lock.json
+.vercel/
+supabase/.temp/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+.vercel

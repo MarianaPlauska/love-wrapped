@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.5" stop-color="#065f46"/>
+      <stop offset="1" stop-color="#4c1d95"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" rx="72" fill="url(#bg)"/>
+  <rect x="88" y="96" width="724" height="330" rx="48" fill="rgba(255,255,255,0.12)"/>
+  <rect x="88" y="458" width="330" height="310" rx="48" fill="rgba(255,255,255,0.12)"/>
+  <rect x="482" y="458" width="330" height="310" rx="48" fill="rgba(255,255,255,0.12)"/>
+  <rect x="88" y="802" width="724" height="304" rx="48" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="225" cy="261" r="110" fill="#bef264" opacity="0.92"/>
+  <circle cx="675" cy="255" r="94" fill="#f9a8d4" opacity="0.82"/>
+  <circle cx="230" cy="603" r="68" fill="#67e8f9" opacity="0.84"/>
+  <circle cx="674" cy="603" r="68" fill="#fbbf24" opacity="0.84"/>
+  <text x="130" y="178" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" letter-spacing="5">LOVE WRAPPED 2026</text>
+  <text x="130" y="292" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="900" letter-spacing="-3">PRINT THIS.</text>
+  <text x="130" y="356" fill="#bef264" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="3">stories-ready summary card</text>
+  <text x="132" y="580" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="900">MEMORIES</text>
+  <text x="526" y="580" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="900">STATS</text>
+  <text x="132" y="924" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="800">NEON, LOVE AND CHAOS.</text>
+</svg>

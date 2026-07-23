@@ -1,0 +1,3 @@
+Adicione aqui uma foto chamada cover.jpg.
+
+Ela sera usada como a foto central da primeira tela do Love Wrapped.

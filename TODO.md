@@ -1,0 +1,20 @@
+# TODO — Love Wrapped
+
+- [x] Revisar organização, simplicidade e separação dos componentes.
+- [x] Centralizar a lógica de uploads fora do formulário.
+- [x] Manter textos e comentários autorais em português brasileiro.
+- [x] Concentrar data, local e constelação em um único slide.
+- [x] Separar o mistério da comida da resposta com Pizza.
+- [x] Adicionar animações à foto do momento favorito.
+- [x] Adicionar animações laterais ao slide da série.
+- [x] Enriquecer a contagem de dias juntas.
+- [x] Tornar explícita a edição das legendas das Polaroids.
+- [x] Ampliar “Quem é mais?” para 10 perguntas editáveis.
+- [x] Revelar perguntas e respostas em etapas.
+- [x] Corrigir a declaração e adicionar brilhos e movimento.
+- [x] Criar um slide próprio para a música com player do Spotify.
+- [x] Remover a arte “PRINT THIS.” e reconstruir o resumo final.
+- [x] Atualizar o README e adicionar um banner animado.
+- [x] Validar todos os slides em viewport mobile.
+- [x] Publicar a nova versão na Vercel.
+- [x] Criar commit e enviar para o GitHub.

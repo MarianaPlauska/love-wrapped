@@ -1,0 +1,9 @@
+.agents/
+.claude/
+dist/
+node_modules/
+supabase/.temp/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
